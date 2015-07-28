@@ -55,6 +55,9 @@ public class MainActivityFragment extends Fragment implements
     MovieAdapter movieAdapter;
     String orderBy;
 
+    public MainActivityFragment() {
+    }
+
     /*Check if user is connected with the internet*/
     public boolean isOnline() {
         ConnectivityManager cm =
@@ -63,37 +66,34 @@ public class MainActivityFragment extends Fragment implements
         return netInfo != null && netInfo.isConnected();
     }
 
-    public MainActivityFragment() {
-    }
-
     /* if preferences is changed check if internet is connected */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if(sharedPreferences!=null) {
-            if (key.equals(getString(R.string.pref_order_key))) {
-                String orderBy = sharedPreferences.getString(getString(R.string.pref_order_key), getString(R.string.pref_order_default));
-                Button refresh = (Button) getActivity().findViewById(R.id.refresh);
+            if (isAdded()) {
+                if (key.equals(getString(R.string.pref_order_key))) {
+                    String orderBy = sharedPreferences.getString(getString(R.string.pref_order_key), getString(R.string.pref_order_default));
+                    Button refresh = (Button) getActivity().findViewById(R.id.refresh);
 
-                if(isOnline()) {
-                    getMovies(orderBy);
-                    refresh.setVisibility(View.INVISIBLE);
-                }
-                else
-                {
-                    Toast.makeText(getActivity().getApplicationContext(), R.string.error_no_internet , Toast.LENGTH_SHORT).show();
-                    refresh.setVisibility(View.VISIBLE);
-                    movieArrayList.clear();
-                    movieAdapter.clear();
-                }
+                    if (isOnline()) {
+                        getMovies(orderBy);
+                        refresh.setVisibility(View.INVISIBLE);
+                    } else {
+                        Toast.makeText(getActivity().getApplicationContext(), R.string.error_no_internet, Toast.LENGTH_SHORT).show();
+                        refresh.setVisibility(View.VISIBLE);
+                        movieArrayList.clear();
+                        movieAdapter.clear();
+                    }
 
-                ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-                String popularity = getString(R.string.pref_order_popularity);
+                    ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+                    String popularity = getString(R.string.pref_order_popularity);
 
-                if (orderBy != null && popularity != null) {
-                    if (orderBy.equals(popularity) && actionBar != null) {
-                        actionBar.setSubtitle(getString(R.string.subtitle_popularity));
-                    } else if (actionBar != null) {
-                        actionBar.setSubtitle(R.string.subtitle_rating);
+                    if (orderBy != null && popularity != null) {
+                        if (orderBy.equals(popularity) && actionBar != null) {
+                            actionBar.setSubtitle(getString(R.string.subtitle_popularity));
+                        } else if (actionBar != null) {
+                            actionBar.setSubtitle(R.string.subtitle_rating);
+                        }
                     }
                 }
             }
