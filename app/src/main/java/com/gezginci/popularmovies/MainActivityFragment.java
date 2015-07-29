@@ -216,6 +216,8 @@ public class MainActivityFragment extends Fragment implements
     /* Async function for fetching movie data from The Movie DB return type doInBackground:AArrayList<Movie>*/
     private class FetchMovieDataFromTMDB extends AsyncTask<String, Void, ArrayList<Movie>> {
 
+        boolean error = false;
+
         public ArrayList<Movie> getMovieDataFromJson(String movieJsonStr) throws JSONException {
 
             final String MOVIE_ITEMS = "results";
@@ -293,7 +295,7 @@ public class MainActivityFragment extends Fragment implements
                 movieJsonStr = buffer.toString();
             } catch (IOException e) {
                 Log.e("FetchMovieDataFromTMDB", e.getMessage(), e);
-                Toast.makeText(getActivity().getApplicationContext(), R.string.error_retrieving_data, Toast.LENGTH_SHORT).show();
+                error = true;
                 return null;
             } finally {
                 if (urlConnection != null) {
@@ -321,10 +323,18 @@ public class MainActivityFragment extends Fragment implements
         @Override
         protected void onPostExecute(ArrayList<Movie> movies) {
             super.onPostExecute(movies);
-            if (movieAdapter != null && movies != null) {
+            if (error) {
+                Toast.makeText(getActivity().getApplicationContext(), R.string.error_retrieving_data, Toast.LENGTH_SHORT).show();
                 movieArrayList.clear();
                 movieAdapter.clear();
-                movieArrayList.addAll(movies);
+                Button refresh = (Button) getActivity().findViewById(R.id.refresh);
+                refresh.setVisibility(View.VISIBLE);
+            } else {
+                if (movieAdapter != null && movies != null) {
+                    movieArrayList.clear();
+                    movieAdapter.clear();
+                    movieArrayList.addAll(movies);
+                }
             }
         }
     }
